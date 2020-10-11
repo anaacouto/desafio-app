@@ -9,15 +9,7 @@ export default function ProjetoCreate({ navigation }) {
 
     const [titulo, setTitulo] = React.useState('');
     const [descricao, setDescricao] = React.useState('');
-    const [dataPrevisaoEntrega, setDataPrevisaoEntrega] = React.useState(new Date());
-    const [show, setShow] = useState(false);
-
-    const onChange = (event, selectedDate) => {
-        const currentDate = selectedDate || dataPrevisaoEntrega;
-        setShow(Platform.OS === 'ios');
-        setDataPrevisaoEntrega(currentDate);
-      };
-
+    const [dataPrevisaoEntrega, setDataPrevisaoEntrega] = React.useState('');
 
     const salvar = () => {
         fetch(api + 'projeto', {
@@ -68,23 +60,11 @@ export default function ProjetoCreate({ navigation }) {
                     <TextInput
                         style={styles.input}
                         label="Data da Previsão de Entrega"
-                        value={dataPrevisaoEntrega.toString()}
-                        underlineColor='#808080'
-                        theme={theme}
-                        onTouchStart={() => setShow(true)}
-                    />
-                    {show && (
-                    <DateTimePicker
-                        style={styles.input}
-                        testID="dateTimePicker"
                         value={dataPrevisaoEntrega}
-                        mode="date"
-                        display="default"
-                        onChange={onChange}
                         underlineColor='#808080'
                         theme={theme}
+                        onChangeText={dataPrevisaoEntrega => setDataPrevisaoEntrega(dataPrevisaoEntrega)}
                     />
-                    )}
                     <Button style={styles.button} labelStyle={styles.buttonLabel} onPress={salvar}>Salvar</Button>
                 </Card>
             </View>
