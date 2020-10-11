@@ -1,6 +1,6 @@
-import React, { useEffect } from 'react';
-import { View, StatusBar, Text, StyleSheet } from 'react-native';
-import { Provider as PaperProvider, Card, TextInput, Button } from 'react-native-paper';
+import React from 'react';
+import { View, StatusBar, Text } from 'react-native';
+import { Provider as PaperProvider, Card, TextInput, Button, RadioButton } from 'react-native-paper';
 import api from '../../services/api';
 import { styles, theme } from '../../components/Styles';
 
@@ -11,6 +11,7 @@ export default function ProjetoEdit({ route, navigation }) {
     const [titulo, setTitulo] = React.useState(projeto.titulo);
     const [descricao, setDescricao] = React.useState(projeto.descricao);
     const [dataPrevisaoEntrega, setDataPrevisaoEntrega] = React.useState(projeto.dataPrevisaoEntrega);
+    const [status, setStatus] = React.useState(projeto.status.toString());
 
     const salvar = () => {
         fetch(api + 'projeto', {
@@ -23,9 +24,19 @@ export default function ProjetoEdit({ route, navigation }) {
                 id: projeto.id,
                 titulo: titulo,
                 descricao: descricao,
-                dataPrevisaoEntrega: dataPrevisaoEntrega
+                dataPrevisaoEntrega: dataPrevisaoEntrega,
+                status: status
             })
-        }).then(() => navigation.navigate('Home')).catch(() => alert('Não foi possível editar o projeto'));
+        })
+        .then((response) => response.json())
+        .then((json) => {
+            if (json.errors.length !=0) {
+                alert(json.errors[0]);
+            } else {
+                navigation.navigate('Home');
+            }
+        })
+        .catch(() => alert('Não foi possível editar o projeto'));
     }
 
     return (
@@ -57,6 +68,11 @@ export default function ProjetoEdit({ route, navigation }) {
                         theme={theme}
                         onChangeText={dataPrevisaoEntrega => setDataPrevisaoEntrega(dataPrevisaoEntrega)}
                     />
+                    <Text style={{marginLeft: 16}}>Projeto entregue?</Text>
+                    <RadioButton.Group onValueChange={status => setStatus(status)} value={status}>
+                        <RadioButton.Item color='#000080' label="Sim" value="true" />
+                        <RadioButton.Item color='#000080' label="Não" value="false" />
+                    </RadioButton.Group>
                     <Button style={styles.button} labelStyle={styles.buttonLabel} onPress={salvar}>Salvar</Button>
                 </Card>
             </View>

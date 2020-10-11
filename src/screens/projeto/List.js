@@ -74,6 +74,8 @@ export default function ProjetoList({ navigation }) {
                                     <Card.Content>
                                         <Title style={{color: '#000'}}>{item.titulo}</Title>
                                         <Paragraph style={{color: '#000'}}>Data de entrega: {item.dataPrevisaoEntrega}</Paragraph>
+                                        <Paragraph style={{ color: item.status ? '#228B22' : '#FF0000', fontWeight: 'bold' }}>{item.status ? 'Entregue' : 'Em andamento'}
+                                        </Paragraph>
                                     </Card.Content>
                                     <Card.Actions>
                                         <Button onPress={() => {

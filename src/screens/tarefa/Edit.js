@@ -1,6 +1,6 @@
 import * as React from 'react';
-import { View, StatusBar, Text, StyleSheet } from 'react-native';
-import { Provider as PaperProvider, Card, TextInput, Button } from 'react-native-paper';
+import { View, StatusBar, Text } from 'react-native';
+import { Provider as PaperProvider, Card, TextInput, Button, RadioButton } from 'react-native-paper';
 import api from '../../services/api';
 import { styles, theme } from '../../components/Styles';
 
@@ -9,6 +9,7 @@ export default function TarefaEdit({ route, navigation }) {
 
     const [titulo, setTitulo] = React.useState(tarefa.titulo);
     const [descricao, setDescricao] = React.useState(tarefa.descricao);
+    const [status, setStatus] = React.useState(projeto.status.toString());
 
     const salvar = () => {
         fetch(api + 'tarefa', {
@@ -21,6 +22,7 @@ export default function TarefaEdit({ route, navigation }) {
                 id: tarefa.id,
                 titulo: titulo,
                 descricao: descricao,
+                status: status,
                 projeto: { id: projeto.id }
             })
         }).then(() => navigation.navigate('Home')).catch(() => alert('Não foi possível criar o projeto'));
@@ -50,6 +52,11 @@ export default function TarefaEdit({ route, navigation }) {
                         theme={theme}
                         onChangeText={descricao => setDescricao(descricao)}
                     />
+                    <Text style={{marginLeft: 16}}>Tarefa concluída?</Text>
+                    <RadioButton.Group onValueChange={status => setStatus(status)} value={status}>
+                        <RadioButton.Item color='#000080' label="Sim" value="true" />
+                        <RadioButton.Item color='#000080' label="Não" value="false" />
+                    </RadioButton.Group>
                     <Button style={styles.button} labelStyle={styles.buttonLabel} onPress={salvar}>Salvar</Button>
                 </Card>
             </View>

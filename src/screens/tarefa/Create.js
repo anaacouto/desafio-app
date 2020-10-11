@@ -39,6 +39,9 @@ export default function TarefaCreate({ route, navigation}) {
         <PaperProvider>
             <View style={styles.container}>
                 <StatusBar barStyle="light-content" />
+                <Card style={{backgroundColor: '#fff'}}>
+                    <Card.Title title={"Projeto " + projeto.titulo} titleStyle={{color: '#000'}} />
+                </Card>
                 <Card style={styles.card}>
                     <TextInput
                         style={styles.input}

@@ -30,8 +30,12 @@ export default function ProjetoDetails({ route, navigation }) {
         <Card style={styles.card}>
           <Card.Content>
             <Paragraph style={{color: '#000'}}>{projeto.descricao}</Paragraph>
-            <Paragraph style={{ fontWeight: "bold", fontSize: 16, color: '#000' }}>Data de entrega: {projeto.dataPrevisaoEntrega}</Paragraph>
+            <Paragraph style={{ fontWeight: "bold", fontSize: 16, color: '#000' }}>Data prevista para entrega: {projeto.dataPrevisaoEntrega}</Paragraph>
+            <Paragraph style={{ color: projeto.status ? '#228B22' : '#FF0000', fontWeight: 'bold' }}>{projeto.status ? 'Entregue' : 'Em andamento'}</Paragraph>
           </Card.Content>
+          <Card.Actions>
+          <Button onPress={() => navigation.navigate('Edit', { projeto: projeto })}>Editar</Button>
+          </Card.Actions>
         </Card>
         <Card>
           <Card.Title style={{color: '#000', backgroundColor: '#fff'}}
@@ -50,6 +54,7 @@ export default function ProjetoDetails({ route, navigation }) {
                 <Card.Content>
                   <Title style={{color: '#000'}}>{item.titulo}</Title>
                   <Paragraph style={{color: '#000'}}>{item.descricao}</Paragraph>
+                  <Paragraph style={{ color: item.status ? '#228B22' : '#FF0000', fontWeight: 'bold' }}>{item.status ? 'Concluída' : 'Em andamento'}</Paragraph>
                 </Card.Content>
                 <Card.Actions>
                   <Button onPress={() => navigation.navigate('TarefaEdit', { projeto: projeto, tarefa: item })}>Editar</Button>

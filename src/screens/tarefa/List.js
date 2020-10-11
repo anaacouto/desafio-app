@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Provider as PaperProvider, ActivityIndicator, Colors, Button, Card, Title, Paragraph, Searchbar, Dialog, Portal } from 'react-native-paper';
-import { View, FlatList, RefreshControl } from 'react-native';
+import { View, FlatList, RefreshControl, Text } from 'react-native';
 import { styles, theme } from '../../components/Styles';
 import api from '../../services/api';
 
@@ -9,7 +9,7 @@ export default function TarefaList({ navigation }) {
     const [isLoading, setLoading] = useState(true);
     const [data, setData] = useState([]);
     const [searchQuery, setSearchQuery] = React.useState('');
-    const [ id, setId] = useState('');
+    const [id, setId] = useState('');
     const [visible, setVisible] = React.useState(false);
 
     const showDialog = (id) => {
@@ -60,27 +60,29 @@ export default function TarefaList({ navigation }) {
                 />
                 {isLoading ? <ActivityIndicator animating={true} color={Colors.red800} /> : (
                     <>
-                    <FlatList
-                        data={data}
-                        refreshControl={
-                            <RefreshControl refreshing={isLoading} onRefresh={() => getData(url)} />
-                        }
-                        keyExtractor={({ id }, index) => id.toString()}
-                        renderItem={({ item }) => (
-                            <Card style={styles.card}>
-                                <Card.Content>
-                                    <Title style={{color: '#000'}}>{item.titulo}</Title>
-                                    <Paragraph style={{color: '#000'}}>{item.descricao}</Paragraph>
-                                    <Paragraph style={{color: '#000'}}>Projeto: {item.projeto.titulo}</Paragraph>
-                                </Card.Content>
-                                <Card.Actions>
-                                    <Button onPress={() => navigation.navigate('TarefaEdit', { projeto: item.projeto, tarefa: item })}>Editar</Button>
-                                    <Button onPress={() => showDialog(item.id)}>Deletar</Button>
-                                </Card.Actions>
-                            </Card>
-                        )}
-                    />
-                    <Portal>
+                        <FlatList
+                            data={data}
+                            refreshControl={
+                                <RefreshControl refreshing={isLoading} onRefresh={() => getData(url)} />
+                            }
+                            keyExtractor={({ id }, index) => id.toString()}
+                            renderItem={({ item }) => (
+                                <Card style={styles.card}>
+                                    <Card.Content>
+                                        <Title style={{ color: '#000' }}>{item.titulo}</Title>
+                                        <Paragraph style={{ color: '#000' }}>{item.descricao}</Paragraph>
+                                        <Paragraph style={{ color: '#000' }}>Projeto: {item.projeto.titulo}</Paragraph>
+                                        <Paragraph style={{ color: item.status ? '#228B22' : '#FF0000', fontWeight: 'bold' }}>{item.status ? 'Concluída' : 'Em andamento'}
+                                        </Paragraph>
+                                    </Card.Content>
+                                    <Card.Actions>
+                                        <Button onPress={() => navigation.navigate('TarefaEdit', { projeto: item.projeto, tarefa: item })}>Editar</Button>
+                                        <Button onPress={() => showDialog(item.id)}>Deletar</Button>
+                                    </Card.Actions>
+                                </Card>
+                            )}
+                        />
+                        <Portal>
                             <Dialog visible={visible} onDismiss={hideDialog}>
                                 <Dialog.Content>
                                     <Paragraph>Deseja realmente deletar essa tarefa?</Paragraph>
@@ -91,7 +93,7 @@ export default function TarefaList({ navigation }) {
                                 </Dialog.Actions>
                             </Dialog>
                         </Portal>
-                        </>
+                    </>
                 )}
             </View>
         </PaperProvider>
