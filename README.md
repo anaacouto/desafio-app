@@ -32,3 +32,5 @@ Caso prefira executar no seu android utilizando o cabo usb, utilize o comando a 
 react-native run-android
 ```
 
+Lembrando que, para a execução através do usb, o android deve estar com o modo desenvolvedor ativado e a depuração usb também (a opção é localizada dentro das opções do desenvolvedor).
+
