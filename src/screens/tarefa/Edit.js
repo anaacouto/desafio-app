@@ -1,17 +1,23 @@
 import * as React from 'react';
 import { View, StatusBar, Text } from 'react-native';
-import { Provider as PaperProvider, Card, TextInput, Button, RadioButton } from 'react-native-paper';
+import { Provider as PaperProvider, Card, TextInput, Button, RadioButton, HelperText } from 'react-native-paper';
 import api from '../../services/api';
 import { styles, theme } from '../../components/Styles';
 
 export default function TarefaEdit({ route, navigation }) {
+
     const { projeto, tarefa } = route.params;
 
     const [titulo, setTitulo] = React.useState(tarefa.titulo);
     const [descricao, setDescricao] = React.useState(tarefa.descricao);
     const [status, setStatus] = React.useState(projeto.status.toString());
 
+    const [hasError, setHasError] = React.useState(false);
+
     const salvar = () => {
+        if (titulo.length == 0) {
+            setHasError(true);
+        } else {
         fetch(api + 'tarefa', {
             method: 'PUT',
             headers: {
@@ -26,6 +32,7 @@ export default function TarefaEdit({ route, navigation }) {
                 projeto: { id: projeto.id }
             })
         }).then(() => navigation.navigate('Home')).catch(() => alert('Não foi possível criar o projeto'));
+        }
     }
 
     return (
@@ -38,7 +45,7 @@ export default function TarefaEdit({ route, navigation }) {
                 <Card style={styles.card}>
                     <TextInput
                         style={styles.input}
-                        label="Título da Tarefa"
+                        label="Título da Tarefa *"
                         value={titulo}
                         underlineColor='#808080'
                         theme={theme}
@@ -57,6 +64,9 @@ export default function TarefaEdit({ route, navigation }) {
                         <RadioButton.Item color='#000080' label="Sim" value="true" />
                         <RadioButton.Item color='#000080' label="Não" value="false" />
                     </RadioButton.Group>
+                    <HelperText type="error" visible={hasError}>
+                        Os campos com * são obrigatórios e não podem ser vazios.
+                    </HelperText>
                     <Button style={styles.button} labelStyle={styles.buttonLabel} onPress={salvar}>Salvar</Button>
                 </Card>
             </View>

@@ -1,16 +1,17 @@
-import React, { useEffect, useState } from 'react';
+import * as React from 'react';
 import { Provider as PaperProvider, ActivityIndicator, Colors, Button, Card, Title, Paragraph, FAB, Dialog, Portal } from 'react-native-paper';
 import { View, FlatList, RefreshControl, TouchableOpacity } from 'react-native';
+import { format, addDays } from 'date-fns';
 import { styles } from '../../components/Styles';
 import api from '../../services/api';
 
 export default function ProjetoList({ navigation }) {
 
-    const [isLoading, setLoading] = useState(true);
+    const [isLoading, setLoading] = React.useState(true);
 
-    const [data, setData] = useState([]);
+    const [data, setData] = React.useState([]);
 
-    const [ id, setId] = useState('');
+    const [ id, setId] = React.useState('');
 
     const [visible, setVisible] = React.useState(false);
 
@@ -50,7 +51,7 @@ export default function ProjetoList({ navigation }) {
         hideDialog();
     }
 
-    useEffect(() => getData(), []);
+    React.useEffect(() => getData(), []);
 
     
     return (
@@ -73,7 +74,7 @@ export default function ProjetoList({ navigation }) {
                                 <Card style={styles.card}>
                                     <Card.Content>
                                         <Title style={{color: '#000'}}>{item.titulo}</Title>
-                                        <Paragraph style={{color: '#000'}}>Data de entrega: {item.dataPrevisaoEntrega}</Paragraph>
+                                        <Paragraph style={{color: '#000'}}>Data de entrega: {format(addDays(new Date(item.dataPrevisaoEntrega), 1), 'dd-MM-yyyy')}</Paragraph>
                                         <Paragraph style={{ color: item.status ? '#228B22' : '#FF0000', fontWeight: 'bold' }}>{item.status ? 'Entregue' : 'Em andamento'}
                                         </Paragraph>
                                     </Card.Content>

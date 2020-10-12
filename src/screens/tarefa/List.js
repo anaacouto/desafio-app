@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import * as React from 'react';
 import { Provider as PaperProvider, ActivityIndicator, Colors, Button, Card, Title, Paragraph, Searchbar, Dialog, Portal } from 'react-native-paper';
 import { View, FlatList, RefreshControl, Text } from 'react-native';
 import { styles, theme } from '../../components/Styles';
@@ -6,10 +6,10 @@ import api from '../../services/api';
 
 export default function TarefaList({ navigation }) {
 
-    const [isLoading, setLoading] = useState(true);
-    const [data, setData] = useState([]);
+    const [isLoading, setLoading] = React.useState(true);
+    const [data, setData] = React.useState([]);
     const [searchQuery, setSearchQuery] = React.useState('');
-    const [id, setId] = useState('');
+    const [id, setId] = React.useState('');
     const [visible, setVisible] = React.useState(false);
 
     const showDialog = (id) => {
@@ -47,7 +47,7 @@ export default function TarefaList({ navigation }) {
             .finally(() => setLoading(false));
     }
 
-    useEffect(() => getData(url), []);
+    React.useEffect(() => getData(url), []);
     return (
         <PaperProvider>
             <View style={styles.container}>
