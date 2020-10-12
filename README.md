@@ -1,6 +1,6 @@
 # desafio-app
 
-Aplicação mobile feita em React Native consumindo da api [deste repositório](https://github.com/anaacouto/desafio-api), portanto é necessário ter a API executando para a execução do projeto. A aplicação foi feita para criar projetos e tarefas associadas, utilizando-se da ferramenta **Expo** durante o desenvolvimento. Abaixo seguem-se instruções para a instalação e execução do projeto:
+Aplicação mobile feita em React Native consumindo da api [deste repositório](https://github.com/anaacouto/desafio-api), portanto é necessário ter a API executando para a execução do projeto. A aplicação foi feita para criar projetos e tarefas associadas, utilizando-se da ferramenta **Expo** para a emulação durante o desenvolvimento. Abaixo seguem-se instruções para a instalação e execução do projeto:
 
 ### React Native e Expo
 
