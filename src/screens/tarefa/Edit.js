@@ -14,24 +14,22 @@ export default function TarefaEdit({ route, navigation }) {
 
     const [hasError, setHasError] = React.useState(false);
 
-    const salvar = () => {
+    async function salvar() {
         if (titulo.length == 0) {
             setHasError(true);
         } else {
-        fetch(api + 'tarefa', {
-            method: 'PUT',
-            headers: {
-                Accept: 'application/json',
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-                id: tarefa.id,
-                titulo: titulo,
-                descricao: descricao,
-                status: status,
-                projeto: { id: projeto.id }
-            })
-        }).then(() => navigation.navigate('Home')).catch(() => alert('Não foi possível criar o projeto'));
+            try {
+                const response = await api.put('tarefa', {
+                    id: tarefa.id,
+                    titulo: titulo,
+                    descricao: descricao,
+                    status: status,
+                    projeto: { id: projeto.id }
+                });
+                navigation.navigate('Home');
+            } catch (error) {
+                alert(error.response.data.errors[0]);
+            }
         }
     }
 
@@ -39,8 +37,8 @@ export default function TarefaEdit({ route, navigation }) {
         <PaperProvider>
             <View style={styles.container}>
                 <StatusBar barStyle="light-content" />
-                <Card style={{backgroundColor: '#fff'}}>
-                    <Card.Title title={"Projeto " + projeto.titulo} titleStyle={{color: '#000'}} />
+                <Card style={{ backgroundColor: '#fff' }}>
+                    <Card.Title title={"Projeto " + projeto.titulo} titleStyle={{ color: '#000' }} />
                 </Card>
                 <Card style={styles.card}>
                     <TextInput
@@ -59,7 +57,7 @@ export default function TarefaEdit({ route, navigation }) {
                         theme={theme}
                         onChangeText={descricao => setDescricao(descricao)}
                     />
-                    <Text style={{marginLeft: 16}}>Tarefa concluída?</Text>
+                    <Text style={{ marginLeft: 16 }}>Tarefa concluída?</Text>
                     <RadioButton.Group onValueChange={status => setStatus(status)} value={status}>
                         <RadioButton.Item color='#000080' label="Sim" value="true" />
                         <RadioButton.Item color='#000080' label="Não" value="false" />

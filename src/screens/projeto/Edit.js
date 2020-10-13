@@ -30,33 +30,22 @@ export default function ProjetoEdit({ route, navigation }) {
         setShow(false);
     };
 
-    const salvar = () => {
+    async function salvar () {
         if (titulo.length == 0 || dataPrevisaoEntrega.length == 0) {
             setHasError(true);
         } else {
-            fetch(api + 'projeto', {
-                method: 'PUT',
-                headers: {
-                    Accept: 'application/json',
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({
+            try {
+                const response = await api.put('projeto', {
                     id: projeto.id,
-                    titulo: titulo,
-                    descricao: descricao,
-                    dataPrevisaoEntrega: format(new Date(dataPicker), 'yyyy-MM-dd'),
-                    status: status
-                })
-            })
-                .then((response) => response.json())
-                .then((json) => {
-                    if (json.errors.length != 0) {
-                        alert(json.errors[0]);
-                    } else {
-                        navigation.navigate('Home');
-                    }
-                })
-                .catch(() => alert('Não foi possível editar o projeto'));
+                        titulo: titulo,
+                        descricao: descricao,
+                        dataPrevisaoEntrega: format(new Date(dataPicker), 'yyyy-MM-dd'),
+                        status: status
+                });
+                navigation.navigate('Home');
+            } catch (error) {
+                alert(error.response.data.errors[0]);
+            }
         }
     }
 

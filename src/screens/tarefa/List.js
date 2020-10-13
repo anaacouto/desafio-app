@@ -19,35 +19,40 @@ export default function TarefaList({ navigation }) {
 
     const hideDialog = () => setVisible(false);
 
-    const url = api + 'tarefa/';
-
     const onChangeSearch = (query) => {
         setSearchQuery(query);
         if (query.length == 0) {
-            getData(url);
+            getData();
         } else if (query.length > 2) {
-            getData(url + '/busca/' + query);
+            getData('tarefa/busca/' + query);
         }
     };
 
-    const deleteData = () => {
-        setLoading(true);
-        fetch(url + id, { method: 'DELETE' })
-            .then((response) => response.json())
-            .then((json) => getData(url))
-            .catch((errors) => console.error(errors));
-        hideDialog();
+    async function deleteData() {
+        const response = await api.delete('tarefa/' + id);
+        if (response.status == 200) {
+            setLoading(true);
+            getData();
+            hideDialog();
+        } else {
+            alert(response.data.errors[0]);
+        }
     }
 
-    const getData = (uri) => {
-        fetch(uri)
-            .then((response) => response.json())
-            .then((json) => setData(json.data))
-            .catch((error) => console.error(error))
-            .finally(() => setLoading(false));
+    async function getData(uri) {
+        const url = uri == undefined ? 'tarefa' : uri;
+        try {
+            const response = await api.get(url);
+            setData(response.data.data);
+        } catch (error) {
+            alert(error.response.data.errors[0]);
+        }
+        setLoading(false);
     }
 
-    React.useEffect(() => getData(url), []);
+    React.useEffect(() => {
+        getData();
+    }, []);
     return (
         <PaperProvider>
             <View style={styles.container}>
@@ -63,7 +68,7 @@ export default function TarefaList({ navigation }) {
                         <FlatList
                             data={data}
                             refreshControl={
-                                <RefreshControl refreshing={isLoading} onRefresh={() => getData(url)} />
+                                <RefreshControl refreshing={isLoading} onRefresh={() => getData()} />
                             }
                             keyExtractor={({ id }, index) => id.toString()}
                             renderItem={({ item }) => (

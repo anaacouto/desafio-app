@@ -13,31 +13,20 @@ export default function TarefaCreate({ route, navigation }) {
 
     const [hasError, setHasError] = React.useState(false);
 
-    const salvar = () => {
+    async function salvar() {
         if (titulo.length == 0) {
             setHasError(true);
         } else {
-            fetch(api + 'tarefa', {
-                method: 'POST',
-                headers: {
-                    Accept: 'application/json',
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({
+            try {
+                const response = await api.post('tarefa', {
                     titulo: titulo,
-                    descricao: descricao,
-                    projeto: { id: projeto.id }
-                })
-            })
-                .then((response) => response.json())
-                .then((json) => {
-                    if (json.errors.length != 0) {
-                        alert(json.errors[0]);
-                    } else {
-                        navigation.navigate('Home');
-                    }
-                })
-                .catch(() => alert('Não foi possível criar o projeto'));
+                        descricao: descricao,
+                        projeto: { id: projeto.id }
+                });
+                navigation.navigate('Home');
+            } catch (error) {
+                alert(error.response.data.errors);
+            }
         }
     }
 

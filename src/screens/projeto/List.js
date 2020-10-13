@@ -11,7 +11,7 @@ export default function ProjetoList({ navigation }) {
 
     const [data, setData] = React.useState([]);
 
-    const [ id, setId] = React.useState('');
+    const [id, setId] = React.useState('');
 
     const [visible, setVisible] = React.useState(false);
 
@@ -22,38 +22,32 @@ export default function ProjetoList({ navigation }) {
 
     const hideDialog = () => setVisible(false);
 
-    const url = api + 'projeto/';
-
-    const getData = () => {
-        fetch(url)
-            .then((response) => response.json())
-            .then((json) => {
-                if (json.errors.length != 0) {
-                    alert(json.errors[0]);
-                }
-                setData(json.data);
-            })
-            .catch((error) => console.error(error))
-            .finally(() => setLoading(false));
+    async function getData() {
+        try {
+            const response = await api.get('projeto');
+            setData(response.data.data);
+        } catch (error) {
+            alert(error.response.data.errors[0]);
+        }
+        setLoading(false);
     }
 
-    const deleteData = () => {
+    async function deleteData () {
         setLoading(true);
-        fetch(url + id, { method: 'DELETE' })
-            .then((response) => response.json())
-            .then((json) => {
-                if (json.errors.length != 0) {
-                    alert(json.errors[0]);
-                }
-                getData();
-            })
-            .catch((errors) => console.error(errors));
+        try {
+            const response = await api.delete('projeto/' + id);
+            getData();
+        } catch (error) {
+            alert(error.response.data.errors[0]);
+        }
         hideDialog();
     }
 
-    React.useEffect(() => getData(), []);
+    React.useEffect(() => {
+        getData();
+    }, []);
 
-    
+
     return (
         <PaperProvider>
             <View style={styles.container}>
@@ -71,23 +65,23 @@ export default function ProjetoList({ navigation }) {
                                         projeto: item,
                                     });
                                 }}>
-                                <Card style={styles.card}>
-                                    <Card.Content>
-                                        <Title style={{color: '#000'}}>{item.titulo}</Title>
-                                        <Paragraph style={{color: '#000'}}>Data de entrega: {format(addDays(new Date(item.dataPrevisaoEntrega), 1), 'dd-MM-yyyy')}</Paragraph>
-                                        <Paragraph style={{ color: item.status ? '#228B22' : '#FF0000', fontWeight: 'bold' }}>{item.status ? 'Entregue' : 'Em andamento'}
-                                        </Paragraph>
-                                    </Card.Content>
-                                    <Card.Actions>
-                                        <Button onPress={() => {
-                                            navigation.navigate('Details', {
-                                                projeto: item,
-                                            });
-                                        }}>Ver</Button>
-                                        <Button onPress={() => navigation.navigate('Edit', { projeto: item })}>Editar</Button>
-                                        <Button onPress={() => showDialog(item.id)}>Deletar</Button>
-                                    </Card.Actions>
-                                </Card>
+                                    <Card style={styles.card}>
+                                        <Card.Content>
+                                            <Title style={{ color: '#000' }}>{item.titulo}</Title>
+                                            <Paragraph style={{ color: '#000' }}>Data de entrega: {format(addDays(new Date(item.dataPrevisaoEntrega), 1), 'dd-MM-yyyy')}</Paragraph>
+                                            <Paragraph style={{ color: item.status ? '#228B22' : '#FF0000', fontWeight: 'bold' }}>{item.status ? 'Entregue' : 'Em andamento'}
+                                            </Paragraph>
+                                        </Card.Content>
+                                        <Card.Actions>
+                                            <Button onPress={() => {
+                                                navigation.navigate('Details', {
+                                                    projeto: item,
+                                                });
+                                            }}>Ver</Button>
+                                            <Button onPress={() => navigation.navigate('Edit', { projeto: item })}>Editar</Button>
+                                            <Button onPress={() => showDialog(item.id)}>Deletar</Button>
+                                        </Card.Actions>
+                                    </Card>
                                 </TouchableOpacity>
                             )}
                         />

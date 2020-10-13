@@ -14,17 +14,19 @@ export default function ProjetoDetails({ route, navigation }) {
 
   const { projeto } = route.params;
 
-  const url = api + 'tarefa/projeto/' + projeto.id;
-
-  const getData = () => {
-    fetch(url)
-      .then((response) => response.json())
-      .then((json) => setData(json.data))
-      .catch((error) => console.error(error))
-      .finally(() => setLoading(false));
+  async function getData () {
+    try {
+      const response = await api.get('tarefa/projeto/' + projeto.id);
+      setLoading(false);
+      setData(response.data.data);
+    } catch (error) {
+      alert(error.response.data.errors[0]);
+    }
   }
 
-  React.useEffect(() => getData(), []);
+  React.useEffect(() => {
+    getData();
+  }, []);
 
   return (
     <PaperProvider>
@@ -48,7 +50,7 @@ export default function ProjetoDetails({ route, navigation }) {
             style={styles.flatList}
             data={data}
             refreshControl={
-              <RefreshControl refreshing={isLoading} onRefresh={() => getData(url)} />
+              <RefreshControl refreshing={isLoading} onRefresh={() => getData()} />
             }
             keyExtractor={({ id }, index) => id.toString()}
             renderItem={({ item }) => (
