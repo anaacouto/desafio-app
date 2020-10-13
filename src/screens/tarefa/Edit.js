@@ -3,6 +3,7 @@ import { View, StatusBar, Text } from 'react-native';
 import { Provider as PaperProvider, Card, TextInput, Button, RadioButton, HelperText } from 'react-native-paper';
 import api from '../../services/api';
 import { styles, theme } from '../../components/Styles';
+import Toast from 'react-native-simple-toast';
 
 export default function TarefaEdit({ route, navigation }) {
 
@@ -26,6 +27,7 @@ export default function TarefaEdit({ route, navigation }) {
                     status: status,
                     projeto: { id: projeto.id }
                 });
+                Toast.show('Tarefa atualizada com sucesso.');
                 navigation.navigate('Home');
             } catch (error) {
                 alert(error.response.data.errors[0]);

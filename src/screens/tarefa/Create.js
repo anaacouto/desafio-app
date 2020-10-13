@@ -3,6 +3,7 @@ import { View, StatusBar } from 'react-native';
 import { Provider as PaperProvider, Card, TextInput, Button, HelperText } from 'react-native-paper';
 import api from '../../services/api';
 import { styles, theme } from '../../components/Styles';
+import Toast from 'react-native-simple-toast';
 
 export default function TarefaCreate({ route, navigation }) {
 
@@ -10,7 +11,6 @@ export default function TarefaCreate({ route, navigation }) {
 
     const [titulo, setTitulo] = React.useState('');
     const [descricao, setDescricao] = React.useState('');
-
     const [hasError, setHasError] = React.useState(false);
 
     async function salvar() {
@@ -23,6 +23,7 @@ export default function TarefaCreate({ route, navigation }) {
                         descricao: descricao,
                         projeto: { id: projeto.id }
                 });
+                Toast.show('Tarefa criada com sucesso.');
                 navigation.navigate('Home');
             } catch (error) {
                 alert(error.response.data.errors);

@@ -4,17 +4,28 @@ import { Provider as PaperProvider, ActivityIndicator, Colors, Button, Card, Tit
 import { format, addDays } from 'date-fns';
 import api from '../../services/api';
 import { stylesDetails as styles } from '../../components/Styles';
+import CardContent from '../../components/CardContent';
+import DeleteDialog from '../../components/DeleteDialog';
+import Toast from 'react-native-simple-toast';
 
 
 export default function ProjetoDetails({ route, navigation }) {
 
-  const [isLoading, setLoading] = React.useState(true);
-
-  const [data, setData] = React.useState([]);
-
   const { projeto } = route.params;
 
-  async function getData () {
+  const [isLoading, setLoading] = React.useState(true);
+  const [data, setData] = React.useState([]);
+  const [id, setId] = React.useState('');
+  const [visible, setVisible] = React.useState(false);
+
+  const showDialog = (id) => {
+    setId(id);
+    setVisible(true);
+  };
+
+  const hideDialog = () => setVisible(false);
+
+  async function getData() {
     try {
       const response = await api.get('tarefa/projeto/' + projeto.id);
       setLoading(false);
@@ -22,6 +33,18 @@ export default function ProjetoDetails({ route, navigation }) {
     } catch (error) {
       alert(error.response.data.errors[0]);
     }
+  }
+
+  async function deleteData() {
+    setLoading(true);
+    try {
+      const response = await api.delete('tarefa/' + id);
+      Toast.show('Tarefa deletada com sucesso.');
+      getData();
+    } catch (error) {
+      alert(response.data.errors[0]);
+    }
+    hideDialog();
   }
 
   React.useEffect(() => {
@@ -32,46 +55,55 @@ export default function ProjetoDetails({ route, navigation }) {
     <PaperProvider>
       <View style={styles.view}>
         <Card style={styles.card}>
-          <Card.Content>
-            <Paragraph style={{color: '#000'}}>{projeto.descricao}</Paragraph>
-            <Paragraph style={{ fontWeight: "bold", fontSize: 16, color: '#000' }}>Data prevista para entrega: {format(addDays(new Date(projeto.dataPrevisaoEntrega), 1), 'dd-MM-yyyy')}</Paragraph>
-            <Paragraph style={{ color: projeto.status ? '#228B22' : '#FF0000', fontWeight: 'bold' }}>{projeto.status ? 'Entregue' : 'Em andamento'}</Paragraph>
-          </Card.Content>
+          <CardContent
+            description={projeto.descricao}
+            description2={"Data de entrega: " + format(addDays(new Date(projeto.dataPrevisaoEntrega), 1), 'dd-MM-yyyy')}
+            status={projeto.status}
+          />
           <Card.Actions>
-          <Button onPress={() => navigation.navigate('Edit', { projeto: projeto })}>Editar</Button>
+            <Button onPress={() => navigation.navigate('Edit', { projeto: projeto })}>Editar</Button>
           </Card.Actions>
         </Card>
         <Card>
-          <Card.Title style={{color: '#000', backgroundColor: '#fff'}}
-            title="Tarefas" titleStyle={{color: '#000'}} />
+          <Card.Title style={{ color: '#000', backgroundColor: '#fff' }}
+            title="Tarefas" titleStyle={{ color: '#000' }} />
         </Card>
         {isLoading ? <ActivityIndicator animating={true} color={Colors.red800} /> : (
-          <FlatList
-            style={styles.flatList}
-            data={data}
-            refreshControl={
-              <RefreshControl refreshing={isLoading} onRefresh={() => getData()} />
-            }
-            keyExtractor={({ id }, index) => id.toString()}
-            renderItem={({ item }) => (
-              <Card style={styles.card}>
-                <Card.Content>
-                  <Title style={{color: '#000'}}>{item.titulo}</Title>
-                  <Paragraph style={{color: '#000'}}>{item.descricao}</Paragraph>
-                  <Paragraph style={{ color: item.status ? '#228B22' : '#FF0000', fontWeight: 'bold' }}>{item.status ? 'Concluída' : 'Em andamento'}</Paragraph>
-                </Card.Content>
-                <Card.Actions>
-                  <Button onPress={() => navigation.navigate('TarefaEdit', { projeto: projeto, tarefa: item })}>Editar</Button>
-                  <Button onPress={() => console.log("delete")}>Deletar</Button>
-                </Card.Actions>
-              </Card>
-            )}
-          />
+          <>
+            <FlatList
+              style={styles.flatList}
+              data={data}
+              refreshControl={
+                <RefreshControl refreshing={isLoading} onRefresh={() => getData()} />
+              }
+              keyExtractor={({ id }, index) => id.toString()}
+              renderItem={({ item }) => (
+                <Card style={styles.card}>
+                  <CardContent
+                    title={item.titulo}
+                    description={item.descricao}
+                    description2={"Projeto: " + item.projeto.titulo}
+                    status={item.status}
+                  />
+                  <Card.Actions>
+                    <Button onPress={() => navigation.navigate('TarefaEdit', { projeto: projeto, tarefa: item })}>Editar</Button>
+                    <Button onPress={() => showDialog(item.id)}>Deletar</Button>
+                  </Card.Actions>
+                </Card>
+              )}
+            />
+            <DeleteDialog
+              visible={visible}
+              hideDialog={() => hideDialog()}
+              content="Deseja realmente deletar essa tarefa?"
+              deleteData={() => deleteData()}
+            />
+          </>
         )}
         <FAB
           style={styles.fab}
           icon="plus"
-          onPress={() => navigation.navigate('TarefaCreate', {projeto: projeto})}
+          onPress={() => navigation.navigate('TarefaCreate', { projeto: projeto })}
         />
       </View>
     </PaperProvider>

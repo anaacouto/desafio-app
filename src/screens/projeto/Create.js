@@ -5,15 +5,14 @@ import DateTimePicker from '@react-native-community/datetimepicker';
 import { format } from 'date-fns';
 import { styles, theme } from '../../components/Styles';
 import api from '../../services/api';
+import Toast from 'react-native-simple-toast';
 
 export default function ProjetoCreate({ navigation }) {
 
     const [titulo, setTitulo] = React.useState('');
     const [descricao, setDescricao] = React.useState('');
     const [dataPrevisaoEntrega, setDataPrevisaoEntrega] = React.useState('');
-
     const [dataPicker, setDataPicker] = React.useState(new Date());
-
     const [hasError, setHasError] = React.useState(false);
     const [show, setShow] = React.useState(false);
 
@@ -38,6 +37,7 @@ export default function ProjetoCreate({ navigation }) {
                     descricao: descricao,
                     dataPrevisaoEntrega: format(new Date(dataPicker), 'yyyy-MM-dd')
                 });
+                Toast.show('Projeto criado com sucesso.');
                 navigation.navigate('Home');
             } catch (error) {
                 alert(error.response.data.errors[0]);

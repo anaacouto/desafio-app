@@ -1,8 +1,11 @@
 import * as React from 'react';
-import { Provider as PaperProvider, ActivityIndicator, Colors, Button, Card, Title, Paragraph, Searchbar, Dialog, Portal } from 'react-native-paper';
-import { View, FlatList, RefreshControl, Text } from 'react-native';
+import { Provider as PaperProvider, ActivityIndicator, Colors, Button, Card, Searchbar } from 'react-native-paper';
+import { View, FlatList, RefreshControl } from 'react-native';
 import { styles, theme } from '../../components/Styles';
+import DeleteDialog from '../../components/DeleteDialog';
+import CardContent from '../../components/CardContent';
 import api from '../../services/api';
+import Toast from 'react-native-simple-toast';
 
 export default function TarefaList({ navigation }) {
 
@@ -29,14 +32,15 @@ export default function TarefaList({ navigation }) {
     };
 
     async function deleteData() {
+        setLoading(true);
+        try {
         const response = await api.delete('tarefa/' + id);
-        if (response.status == 200) {
-            setLoading(true);
-            getData();
-            hideDialog();
-        } else {
-            alert(response.data.errors[0]);
+        Toast.show('Tarefa deletada com sucesso.');
+        getData();
+        } catch (error) {
+        alert(response.data.errors[0]);
         }
+        hideDialog();
     }
 
     async function getData(uri) {
@@ -53,6 +57,7 @@ export default function TarefaList({ navigation }) {
     React.useEffect(() => {
         getData();
     }, []);
+
     return (
         <PaperProvider>
             <View style={styles.container}>
@@ -70,16 +75,15 @@ export default function TarefaList({ navigation }) {
                             refreshControl={
                                 <RefreshControl refreshing={isLoading} onRefresh={() => getData()} />
                             }
-                            keyExtractor={({ id }, index) => id.toString()}
+                            keyExtractor={({ id }) => id.toString()}
                             renderItem={({ item }) => (
                                 <Card style={styles.card}>
-                                    <Card.Content>
-                                        <Title style={{ color: '#000' }}>{item.titulo}</Title>
-                                        <Paragraph style={{ color: '#000' }}>{item.descricao}</Paragraph>
-                                        <Paragraph style={{ color: '#000' }}>Projeto: {item.projeto.titulo}</Paragraph>
-                                        <Paragraph style={{ color: item.status ? '#228B22' : '#FF0000', fontWeight: 'bold' }}>{item.status ? 'Concluída' : 'Em andamento'}
-                                        </Paragraph>
-                                    </Card.Content>
+                                    <CardContent
+                                        title={item.titulo}
+                                        description={item.descricao}
+                                        description2={"Projeto: " + item.projeto.titulo}
+                                        status={item.status}
+                                    />
                                     <Card.Actions>
                                         <Button onPress={() => navigation.navigate('TarefaEdit', { projeto: item.projeto, tarefa: item })}>Editar</Button>
                                         <Button onPress={() => showDialog(item.id)}>Deletar</Button>
@@ -87,17 +91,12 @@ export default function TarefaList({ navigation }) {
                                 </Card>
                             )}
                         />
-                        <Portal>
-                            <Dialog visible={visible} onDismiss={hideDialog}>
-                                <Dialog.Content>
-                                    <Paragraph>Deseja realmente deletar essa tarefa?</Paragraph>
-                                </Dialog.Content>
-                                <Dialog.Actions>
-                                    <Button onPress={hideDialog}>Não</Button>
-                                    <Button onPress={deleteData}>Sim</Button>
-                                </Dialog.Actions>
-                            </Dialog>
-                        </Portal>
+                        <DeleteDialog
+                            visible={visible}
+                            hideDialog={() => hideDialog()}
+                            content="Deseja realmente deletar essa tarefa?"
+                            deleteData={() => deleteData()}
+                        />
                     </>
                 )}
             </View>

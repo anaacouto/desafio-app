@@ -1,18 +1,18 @@
 import * as React from 'react';
-import { Provider as PaperProvider, ActivityIndicator, Colors, Button, Card, Title, Paragraph, FAB, Dialog, Portal } from 'react-native-paper';
+import { Provider as PaperProvider, ActivityIndicator, Colors, Button, Card, FAB } from 'react-native-paper';
 import { View, FlatList, RefreshControl, TouchableOpacity } from 'react-native';
 import { format, addDays } from 'date-fns';
 import { styles } from '../../components/Styles';
+import DeleteDialog from '../../components/DeleteDialog';
+import CardContent from '../../components/CardContent';
 import api from '../../services/api';
+import Toast from 'react-native-simple-toast';
 
 export default function ProjetoList({ navigation }) {
 
     const [isLoading, setLoading] = React.useState(true);
-
     const [data, setData] = React.useState([]);
-
     const [id, setId] = React.useState('');
-
     const [visible, setVisible] = React.useState(false);
 
     const showDialog = (id) => {
@@ -32,10 +32,11 @@ export default function ProjetoList({ navigation }) {
         setLoading(false);
     }
 
-    async function deleteData () {
+    async function deleteData() {
         setLoading(true);
         try {
             const response = await api.delete('projeto/' + id);
+            Toast.show('Projeto deletado com sucesso.');
             getData();
         } catch (error) {
             alert(error.response.data.errors[0]);
@@ -58,7 +59,7 @@ export default function ProjetoList({ navigation }) {
                             refreshControl={
                                 <RefreshControl refreshing={isLoading} onRefresh={getData} />
                             }
-                            keyExtractor={({ id }, index) => id.toString()}
+                            keyExtractor={({ id }) => id.toString()}
                             renderItem={({ item }) => (
                                 <TouchableOpacity onPress={() => {
                                     navigation.navigate('Details', {
@@ -66,36 +67,37 @@ export default function ProjetoList({ navigation }) {
                                     });
                                 }}>
                                     <Card style={styles.card}>
-                                        <Card.Content>
-                                            <Title style={{ color: '#000' }}>{item.titulo}</Title>
-                                            <Paragraph style={{ color: '#000' }}>Data de entrega: {format(addDays(new Date(item.dataPrevisaoEntrega), 1), 'dd-MM-yyyy')}</Paragraph>
-                                            <Paragraph style={{ color: item.status ? '#228B22' : '#FF0000', fontWeight: 'bold' }}>{item.status ? 'Entregue' : 'Em andamento'}
-                                            </Paragraph>
-                                        </Card.Content>
+                                        <CardContent
+                                            title={item.titulo}
+                                            description={item.descricao}
+                                            description2={"Data de entrega: " + format(addDays(new Date(item.dataPrevisaoEntrega), 1), 'dd-MM-yyyy')}
+                                            status={item.status}
+                                        />
                                         <Card.Actions>
                                             <Button onPress={() => {
                                                 navigation.navigate('Details', {
                                                     projeto: item,
                                                 });
                                             }}>Ver</Button>
-                                            <Button onPress={() => navigation.navigate('Edit', { projeto: item })}>Editar</Button>
-                                            <Button onPress={() => showDialog(item.id)}>Deletar</Button>
+                                            <Button
+                                                onPress={() => navigation.navigate('Edit', { projeto: item })}>
+                                                Editar
+                                                </Button>
+                                            <Button
+                                                onPress={() => showDialog(item.id)}>
+                                                Deletar
+                                            </Button>
                                         </Card.Actions>
                                     </Card>
                                 </TouchableOpacity>
                             )}
                         />
-                        <Portal>
-                            <Dialog visible={visible} onDismiss={hideDialog}>
-                                <Dialog.Content>
-                                    <Paragraph>Deseja realmente deletar esse projeto?</Paragraph>
-                                </Dialog.Content>
-                                <Dialog.Actions>
-                                    <Button onPress={hideDialog}>Não</Button>
-                                    <Button onPress={deleteData}>Sim</Button>
-                                </Dialog.Actions>
-                            </Dialog>
-                        </Portal>
+                        <DeleteDialog
+                            visible={visible}
+                            hideDialog={() => hideDialog()}
+                            content="Deseja realmente deletar esse projeto?"
+                            deleteData={() => deleteData()}
+                        />
                     </>
                 )}
                 <FAB

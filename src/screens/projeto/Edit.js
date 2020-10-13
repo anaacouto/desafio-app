@@ -5,6 +5,7 @@ import api from '../../services/api';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { format, addDays } from 'date-fns';
 import { styles, theme } from '../../components/Styles';
+import Toast from 'react-native-simple-toast';
 
 export default function ProjetoEdit({ route, navigation }) {
 
@@ -14,7 +15,6 @@ export default function ProjetoEdit({ route, navigation }) {
     const [descricao, setDescricao] = React.useState(projeto.descricao);
     const [dataPrevisaoEntrega, setDataPrevisaoEntrega] = React.useState(format(addDays(new Date(projeto.dataPrevisaoEntrega), 1), 'dd-MM-yyyy'));
     const [status, setStatus] = React.useState(projeto.status.toString());
-
     const [dataPicker, setDataPicker] = React.useState(addDays(new Date(projeto.dataPrevisaoEntrega), 1));
     const [show, setShow] = React.useState(false);
     const [hasError, setHasError] = React.useState(false);
@@ -30,18 +30,19 @@ export default function ProjetoEdit({ route, navigation }) {
         setShow(false);
     };
 
-    async function salvar () {
+    async function salvar() {
         if (titulo.length == 0 || dataPrevisaoEntrega.length == 0) {
             setHasError(true);
         } else {
             try {
                 const response = await api.put('projeto', {
                     id: projeto.id,
-                        titulo: titulo,
-                        descricao: descricao,
-                        dataPrevisaoEntrega: format(new Date(dataPicker), 'yyyy-MM-dd'),
-                        status: status
+                    titulo: titulo,
+                    descricao: descricao,
+                    dataPrevisaoEntrega: format(new Date(dataPicker), 'yyyy-MM-dd'),
+                    status: status
                 });
+                Toast.show('Projeto atualizado com sucesso.');
                 navigation.navigate('Home');
             } catch (error) {
                 alert(error.response.data.errors[0]);
